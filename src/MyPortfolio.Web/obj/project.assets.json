@@ -1,0 +1,146 @@
+{
+  "version": 3,
+  "targets": {
+    "net9.0": {
+      "MyPortfolio.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "MyPortfolio.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/MyPortfolio.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MyPortfolio.Application.dll": {}
+        }
+      },
+      "MyPortfolio.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/MyPortfolio.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MyPortfolio.Domain.dll": {}
+        }
+      },
+      "MyPortfolio.Infrastructure/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "MyPortfolio.Application": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/MyPortfolio.Infrastructure.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MyPortfolio.Infrastructure.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "MyPortfolio.Application/1.0.0": {
+      "type": "project",
+      "path": "../MyPortfolio.Application/MyPortfolio.Application.csproj",
+      "msbuildProject": "../MyPortfolio.Application/MyPortfolio.Application.csproj"
+    },
+    "MyPortfolio.Domain/1.0.0": {
+      "type": "project",
+      "path": "../MyPortfolio.Domain/MyPortfolio.Domain.csproj",
+      "msbuildProject": "../MyPortfolio.Domain/MyPortfolio.Domain.csproj"
+    },
+    "MyPortfolio.Infrastructure/1.0.0": {
+      "type": "project",
+      "path": "../MyPortfolio.Infrastructure/MyPortfolio.Infrastructure.csproj",
+      "msbuildProject": "../MyPortfolio.Infrastructure/MyPortfolio.Infrastructure.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net9.0": [
+      "MyPortfolio.Application >= 1.0.0",
+      "MyPortfolio.Infrastructure >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\Max\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "H:\\Development\\Portfolio-Website\\src\\MyPortfolio.Web\\MyPortfolio.Web.csproj",
+      "projectName": "MyPortfolio.Web",
+      "projectPath": "H:\\Development\\Portfolio-Website\\src\\MyPortfolio.Web\\MyPortfolio.Web.csproj",
+      "packagesPath": "C:\\Users\\Max\\.nuget\\packages\\",
+      "outputPath": "H:\\Development\\Portfolio-Website\\src\\MyPortfolio.Web\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\Max\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net9.0"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "projectReferences": {
+            "H:\\Development\\Portfolio-Website\\src\\MyPortfolio.Application\\MyPortfolio.Application.csproj": {
+              "projectPath": "H:\\Development\\Portfolio-Website\\src\\MyPortfolio.Application\\MyPortfolio.Application.csproj"
+            },
+            "H:\\Development\\Portfolio-Website\\src\\MyPortfolio.Infrastructure\\MyPortfolio.Infrastructure.csproj": {
+              "projectPath": "H:\\Development\\Portfolio-Website\\src\\MyPortfolio.Infrastructure\\MyPortfolio.Infrastructure.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.300"
+    },
+    "frameworks": {
+      "net9.0": {
+        "targetAlias": "net9.0",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.AspNetCore.App": {
+            "privateAssets": "none"
+          },
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
