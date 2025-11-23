@@ -1,6 +1,6 @@
 # Portfolio Website - Frontend
 
-React Frontend mit Vite und Bootstrap.
+React Frontend mit Vite und **Tailwind CSS** 🎨
 
 ## 🚀 Schnellstart
 
@@ -20,116 +20,116 @@ npm run preview
 
 **Development URL:** http://localhost:5173
 
-## 📁 Struktur
+## 📦 Tech Stack
 
+- ⚡ **Vite** - Next Generation Frontend Tooling
+- ⚛️ **React 19** - UI Library
+- 🎨 **Tailwind CSS** - Utility-First CSS Framework
+- 📡 **Proxy Setup** - API calls zu Backend (Port 5298)
+
+## 🎨 Tailwind CSS
+
+### Setup
+
+Tailwind ist bereits konfiguriert:
+- [tailwind.config.js](file:///h:/Development/Portfolio-Website/src/MyPortfolio.Web/ClientApp/tailwind.config.js) - Content paths und Theme
+- [postcss.config.js](file:///h:/Development/Portfolio-Website/src/MyPortfolio.Web/ClientApp/postcss.config.js) - PostCSS mit Tailwind & Autoprefixer
+
+### Verwendung
+
+```jsx
+// Utility Classes direkt in JSX verwenden
+<button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+  Click me
+</button>
+
+// Responsive Design
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {/* Grid Items */}
+</div>
+
+// Custom Animations (definiert in tailwind.config.js)
+<img className="animate-spin-slow" src={logo} />
 ```
-ClientApp/
-├── public/              # Statische Dateien
-├── src/
-│   ├── assets/         # Bilder, Icons, etc.
-│   ├── components/     # React Components
-│   ├── pages/          # Page Components
-│   ├── styles/         # CSS/SCSS Dateien
-│   ├── services/       # API Services
-│   ├── App.jsx         # Root Component
-│   └── main.jsx        # Entry Point
-├── index.html
-├── package.json
-└── vite.config.js
-```
 
-## 🧩 Häufige Anwendungsfälle
+## 🧩 Beispiel: Component mit Tailwind
 
-### 1. Neuen Component erstellen
-
-**Beispiel: ProjectCard Component**
+**ProjectCard Component:**
 
 ```jsx
 // src/components/ProjectCard.jsx
-import React from 'react';
-
 export const ProjectCard = ({ project }) => {
   return (
-    <div className="card h-100">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
       <img 
         src={project.imageUrl} 
-        className="card-img-top" 
+        className="w-full h-48 object-cover" 
         alt={project.title} 
       />
-      <div className="card-body">
-        <h5 className="card-title">{project.title}</h5>
-        <p className="card-text">{project.description}</p>
-        <div className="d-flex flex-wrap gap-1">
+      <div className="p-6">
+        <h3 className="text-xl font-bold mb-2">{project.title}</h3>
+        <p className="text-gray-600 dark:text-gray-300 mb-4">
+          {project.description}
+        </p>
+        
+        {/* Tech Stack Badges */}
+        <div className="flex flex-wrap gap-2 mb-4">
           {project.technologies.map((tech, index) => (
-            <span key={index} className="badge bg-primary">
+            <span 
+              key={index} 
+              className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+            >
               {tech}
             </span>
           ))}
         </div>
-      </div>
-      <div className="card-footer">
-        <a href={project.projectUrl} className="btn btn-primary btn-sm">
-          Live Demo
-        </a>
-        <a href={project.gitHubUrl} className="btn btn-outline-secondary btn-sm ms-2">
-          GitHub
-        </a>
+        
+        {/* Actions */}
+        <div className="flex gap-2">
+          <a 
+            href={project.projectUrl}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            Live Demo
+          </a>
+          <a 
+            href={project.gitHubUrl}
+            className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+          >
+            GitHub
+          </a>
+        </div>
       </div>
     </div>
   );
 };
 ```
 
-**Verwendung:**
-```jsx
-import { ProjectCard } from './components/ProjectCard';
+## 📡 API Integration
 
-function App() {
-  return (
-    <div className="container">
-      <ProjectCard project={projectData} />
-    </div>
-  );
-}
-```
-
-### 2. API-Aufruf mit Fetch
-
-**Beispiel: API Service**
+**API Service mit Fetch:**
 
 ```jsx
 // src/services/api.js
-const API_BASE_URL = 'http://localhost:5298/api';
+const API_BASE_URL = '/api'; // Proxy zu localhost:5298
 
 export const projectService = {
-  // Alle Projekte abrufen
   async getAll() {
     const response = await fetch(`${API_BASE_URL}/projects`);
     if (!response.ok) throw new Error('Failed to fetch projects');
     return response.json();
   },
-
-  // Einzelnes Projekt abrufen
+  
   async getById(id) {
     const response = await fetch(`${API_BASE_URL}/projects/${id}`);
     if (!response.ok) throw new Error('Failed to fetch project');
-    return response.json();
-  },
-
-  // Neues Projekt erstellen
-  async create(project) {
-    const response = await fetch(`${API_BASE_URL}/projects`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(project)
-    });
-    if (!response.ok) throw new Error('Failed to create project');
     return response.json();
   }
 };
 ```
 
 **Verwendung in Component:**
+
 ```jsx
 import { useState, useEffect } from 'react';
 import { projectService } from '../services/api';
@@ -137,237 +137,44 @@ import { projectService } from '../services/api';
 export const ProjectList = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    loadProjects();
+    projectService.getAll()
+      .then(setProjects)
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
-  const loadProjects = async () => {
-    try {
-      setLoading(true);
-      const data = await projectService.getAll();
-      setProjects(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) return <div className="spinner-border">Loading...</div>;
-  if (error) return <div className="alert alert-danger">{error}</div>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="row g-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
       {projects.map(project => (
-        <div key={project.id} className="col-md-4">
-          <ProjectCard project={project} />
-        </div>
+        <ProjectCard key={project.id} project={project} />
       ))}
     </div>
   );
 };
 ```
 
-### 3. Bootstrap Integration
+## 💡 Tailwind Best Practices
 
-**CSS importieren:**
-```jsx
-// src/main.jsx
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import App from './App.jsx';
-import './index.css';
-
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
-```
-
-**Bootstrap Components verwenden:**
-```jsx
-// Navbar Beispiel
-export const Navbar = () => {
-  return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div className="container">
-        <a className="navbar-brand" href="/">Portfolio</a>
-        <button 
-          className="navbar-toggler" 
-          type="button" 
-          data-bs-toggle="collapse" 
-          data-bs-target="#navbarNav"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-              <a className="nav-link" href="#about">About</a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#projects">Projects</a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#contact">Contact</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-  );
-};
-```
-
-### 4. Routing mit React Router (optional)
-
-**Installation:**
-```bash
-npm install react-router-dom
-```
-
-**Setup:**
-```jsx
-// src/App.jsx
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Home } from './pages/Home';
-import { Projects } from './pages/Projects';
-import { ProjectDetail } from './pages/ProjectDetail';
-
-function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/projects" element={<Projects />} />
-        <Route path="/projects/:id" element={<ProjectDetail />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
-```
-
-### 5. Formular-Handling
-
-**Beispiel: Contact Form**
-```jsx
-import { useState } from 'react';
-
-export const ContactForm = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
-  });
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-      if (response.ok) {
-        alert('Message sent successfully!');
-        setFormData({ name: '', email: '', message: '' });
-      }
-    } catch (error) {
-      alert('Failed to send message');
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="needs-validation">
-      <div className="mb-3">
-        <label htmlFor="name" className="form-label">Name</label>
-        <input
-          type="text"
-          className="form-control"
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div className="mb-3">
-        <label htmlFor="email" className="form-label">Email</label>
-        <input
-          type="email"
-          className="form-control"
-          id="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div className="mb-3">
-        <label htmlFor="message" className="form-label">Message</label>
-        <textarea
-          className="form-control"
-          id="message"
-          name="message"
-          rows="5"
-          value={formData.message}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <button type="submit" className="btn btn-primary">Send</button>
-    </form>
-  );
-};
-```
-
-### 6. Responsive Layout
-
-**Beispiel: Projects Grid**
-```jsx
-export const ProjectsGrid = ({ projects }) => {
-  return (
-    <div className="container py-5">
-      <h2 className="text-center mb-5">My Projects</h2>
-      <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        {projects.map(project => (
-          <div key={project.id} className="col">
-            <ProjectCard project={project} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-```
-
-## 💡 Best Practices
-
-1. **Component-Organisation:** Kleine, wiederverwendbare Components
-2. **State Management:** `useState` für lokalen State, Context API für globalen State
-3. **API Calls:** Zentralisiert in `services/` Ordner
-4. **Error Handling:** Try-catch für async Operationen
-5. **Loading States:** Spinner für bessere UX
-6. **Responsive Design:** Bootstrap Grid System nutzen
+1. **Utility-First** - Nutze Tailwind utilities statt custom CSS
+2. **Responsive Design** - Nutze `sm:`, `md:`, `lg:`, `xl:` prefixes
+3. **Dark Mode** - Nutze `dark:` prefix für dark mode styles
+4. **Custom Config** - Erweitere `tailwind.config.js` für custom values
+5. **Component Extraction** - Erstelle React Components für wiederverwendbare Patterns
 
 ## 🔧 Vite Konfiguration
 
 ```js
 // vite.config.js
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -382,24 +189,10 @@ export default defineConfig({
 })
 ```
 
-## 📦 Wichtige NPM Scripts
+## 📚 Nützliche Ressourcen
 
-```json
-{
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "eslint . --ext js,jsx"
-  }
-}
-```
-
-## 🌐 Deployment
-
-**Build für Production:**
-```bash
-npm run build
-```
-
-Die Build-Dateien werden in `dist/` erstellt und können auf jedem Static Hosting Service deployed werden.
+- [Tailwind CSS Docs](https://tailwindcss.com/docs)
+- [Tailwind UI Components](https://tailwindui.com/)
+- [Tailwind Play](https://play.tailwindcss.com/) - Online Playground
+- [React Docs](https://react.dev)
+- [Vite Docs](https://vite.dev)
