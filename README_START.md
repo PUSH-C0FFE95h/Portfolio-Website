@@ -1,36 +1,86 @@
-# Projekt starten
+# Portfolio Website - Getting Started
+
+## Übersicht
+Portfolio-Website mit Clean Architecture:
+- **Backend:** ASP.NET Core 9, Entity Framework Core, PostgreSQL
+- **Frontend:** React (Vite), Bootstrap
+- **Architektur:** Domain, Application, Infrastructure, Web
 
 ## Voraussetzungen
-Damit das gesamte System läuft, benötigst du folgende Tools:
-1.  **Docker Desktop**: Für die PostgreSQL Datenbank.
-2.  **Node.js (LTS)**: Für das React Frontend.
-3.  **.NET 9 SDK**: Für das Backend (hast du bereits).
+✅ **.NET 9 SDK** - bereits installiert  
+✅ **Docker Desktop** - für PostgreSQL  
+✅ **Node.js (LTS)** - für React  
 
-## 1. Datenbank starten
-Stelle sicher, dass Docker Desktop läuft. Starte dann die Datenbank mit:
+## 🚀 Projekt starten
+
+### 1. Datenbank starten
 ```powershell
 docker-compose up -d
 ```
-Dies startet einen PostgreSQL Container auf Port 5432.
+Dies startet PostgreSQL auf Port 5432.
 
-## 2. Backend starten
-Das Backend ist eine ASP.NET Core Web API.
+### 2. Backend starten
 ```powershell
 dotnet run --project src/MyPortfolio.Web
 ```
-Nach dem Start findest du die API-Dokumentation (Swagger) unter:
-👉 [http://localhost:5298/swagger](http://localhost:5298/swagger)
+**Swagger UI:** [http://localhost:5298/swagger](http://localhost:5298/swagger)
 
-## 3. Frontend starten (noch nicht verfügbar)
-*Aktuell fehlt noch Node.js auf deinem System. Sobald du es installiert hast, kann ich das Frontend mit `npm create vite@latest` erstellen.*
+### 3. Frontend starten
+```powershell
+cd src/MyPortfolio.Web/ClientApp
+npm run dev
+```
+**Frontend:** [http://localhost:5173](http://localhost:5173)
 
-## Aktueller Stand (Aufgabenliste)
-- [x] **Projekt-Struktur:** Clean Architecture (Domain, Application, Infrastructure, Web) steht.
-- [x] **Datenbank:** Entity Framework Core & PostgreSQL sind konfiguriert. Migrations sind erstellt.
-- [x] **Application Layer:** DTOs, Interfaces und Mapping (Mapster) sind eingerichtet.
-- [x] **Repository:** `ProjectRepository` ist implementiert und registriert.
-- [ ] **Frontend:** Wartet auf Node.js Installation.
+## 📋 Was ist bereits implementiert?
 
-## Troubleshooting
--   **Datenbank-Fehler:** Wenn beim Starten des Backends Fehler zur Datenbank kommen, prüfe ob der Docker-Container läuft (`docker ps`).
--   **Build-Fehler:** Falls Pakete fehlen, führe `dotnet restore` aus.
+### ✅ Backend
+- Clean Architecture (Domain, Application, Infrastructure, Web)
+- Entity Framework Core mit PostgreSQL
+- Datenbank-Migrationen angewendet
+- Dependency Injection konfiguriert
+- Mapster für Object Mapping
+- Swagger/OpenAPI Dokumentation
+- `Project` Entity und Repository
+
+### ✅ Frontend
+- React mit Vite
+- Bootstrap installiert
+- Grundstruktur erstellt
+
+### 🔜 Nächste Schritte
+- API-Endpoints für Projekte erstellen
+- Portfolio-Layout im Frontend bauen
+- CRUD-Funktionalität implementieren
+
+## 🛠️ Troubleshooting
+
+**Datenbank-Fehler:**
+```powershell
+docker ps  # Container-Status prüfen
+docker-compose logs  # Logs ansehen
+```
+
+**Build-Fehler:**
+```powershell
+dotnet restore
+dotnet build
+```
+
+**Frontend-Fehler:**
+```powershell
+cd src/MyPortfolio.Web/ClientApp
+npm install
+```
+
+## 📁 Projekt-Struktur
+```
+├── src/
+│   ├── MyPortfolio.Domain/          # Entities, Enums
+│   ├── MyPortfolio.Application/     # DTOs, Interfaces, Mapping
+│   ├── MyPortfolio.Infrastructure/  # DbContext, Repositories
+│   └── MyPortfolio.Web/             # API, Program.cs
+│       └── ClientApp/               # React Frontend
+├── docker-compose.yml
+└── MyPortfolio.sln
+```
