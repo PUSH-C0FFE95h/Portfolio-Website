@@ -42,7 +42,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection(); // Ensure this is before others if needed, but Hangfire/Hubs usually fine.
 
 app.UseHangfireDashboard();
-app.MapHub<NotificationHub>("/notificationHub");
+// app.MapHub<NotificationHub>("/notificationHub");
 
 var summaries = new[]
 {

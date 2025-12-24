@@ -1,296 +1,140 @@
-# Portfolio Website
+# Portfolio Website - Clean Architecture Showcase
 
-Eine Portfolio-Website mit Clean Architecture, ASP.NET Core 9, PostgreSQL und React.
+Eine moderne Full-Stack-Applikation, die **Clean Architecture** Prinzipien mit aktuellen Technologien wie **ASP.NET Core 9**, **React 19**, **TanStack Query** und **shadcn/ui** verbindet.
 
-## 📋 Inhaltsverzeichnis
-- [Architektur](#architektur)
-- [Projekt-Struktur](#projekt-struktur)
-- [Clean Architecture Layers](#clean-architecture-layers)
-- [Technologie-Stack](#technologie-stack)
-- [Schnellstart](#schnellstart)
+## 🏗 Architektur-Übersicht (Clean Architecture)
 
-## Architektur
+Das Projekt ist in vier strikt getrennte Schichten unterteilt, wobei die Abhängigkeiten immer nach innen (zur Domain) zeigen.
 
-Dieses Projekt folgt dem **Clean Architecture** Ansatz:
-
-```
-┌─────────────────────────────────────────┐
-│           Presentation (Web)            │
-│    ┌─────────────────────────────┐     │
-│    │      ASP.NET Core API       │     │
-│    │      React Frontend         │     │
-│    └─────────────────────────────┘     │
-└─────────────────────────────────────────┘
-                    │
-┌─────────────────────────────────────────┐
-│         Infrastructure Layer            │
-│   ┌──────────┐      ┌──────────────┐   │
-│   │ Database │      │ Repositories │   │
-│   │  (EF)    │      │              │   │
-│   └──────────┘      └──────────────┘   │
-└─────────────────────────────────────────┘
-                    │
-┌─────────────────────────────────────────┐
-│         Application Layer               │
-│   ┌──────────┐      ┌──────────────┐   │
-│   │   DTOs   │      │  Interfaces  │   │
-│   │ Mapping  │      │   Services   │   │
-│   └──────────┘      └──────────────┘   │
-└─────────────────────────────────────────┘
-                    │
-┌─────────────────────────────────────────┐
-│           Domain Layer                  │
-│        ┌──────────────────┐             │
-│        │    Entities      │             │
-│        │  Business Logic  │             │
-│        └──────────────────┘             │
-└─────────────────────────────────────────┘
+```mermaid
+graph TD
+    Web[Presentation Layer (Web API + ClientApp)] --> App
+    Web --> Inf
+    Inf[Infrastructure Layer (DB, Hangfire, MinIO)] --> App
+    App[Application Layer (CQRS, Logic)] --> Dom
+    Dom[Domain Layer (Entities, Rules)]
 ```
 
-## Projekt-Struktur
+### 1️⃣ Domain Layer (`MyPortfolio.Domain`)
+**Der Kern.** Enthält Unternehmenslogik, Entities und Enums. Keine Abhängigkeiten zu Frameworks oder Datenbanken.
+*   **Inhalt:** `Project`, `Customer` Entities.
 
-```
-Portfolio-Website/
-├── src/
-│   ├── MyPortfolio.Domain/
-│   │   └── Entities/
-│   │       └── Project.cs
-│   │
-│   ├── MyPortfolio.Application/
-│   │   ├── DTOs/
-│   │   │   └── ProjectDto.cs
-│   │   ├── Interfaces/
-│   │   │   └── IProjectRepository.cs
-│   │   └── DependencyInjection.cs
-│   │
-│   ├── MyPortfolio.Infrastructure/
-│   │   ├── Persistence/
-│   │   │   └── ApplicationDbContext.cs
-│   │   ├── Repositories/
-│   │   │   └── ProjectRepository.cs
-│   │   └── DependencyInjection.cs
-│   │
-│   └── MyPortfolio.Web/
-│       ├── Program.cs
-│       ├── appsettings.json
-│       └── ClientApp/          (React Frontend)
-│
-├── docker-compose.yml
-├── README.md
-└── README_START.md
-```
+### 2️⃣ Application Layer (`MyPortfolio.Application`)
+**Die Steuerung.** Orchestriert die Anwendungsfälle (Use Cases). Nutzt **CQRS** (Command Query Responsibility Segregation) via **MediatR**.
+*   **Pattern:** CQRS (Commands für Writes, Queries für Reads).
+*   **Validierung:** **FluentValidation** prüft Inputs (Pipeline Behavior).
+*   **Mapping:** **Mapster** für Entity-DTO Konvertierung.
 
-## Clean Architecture Layers
+### 3️⃣ Infrastructure Layer (`MyPortfolio.Infrastructure`)
+**Die Werkzeuge.** Implementiert Interfaces aus dem Application Layer.
+*   **Datenbank:** Entity Framework Core 9 (Write) & **Dapper** (High-Performance Read).
+*   **Storage:** **MinIO** (S3-kompatibel) für Datei-Uploads (Blob Storage).
+*   **Background Jobs:** **Hangfire** für zeitgesteuerte Aufgaben (z.B. E-Mail Versand).
 
-### 1️⃣ Domain Layer
-**Zweck:** Enthält die Geschäftslogik und Domain-Entities.  
-**Abhängigkeiten:** Keine (unabhängig von allen anderen Layern)
+### 4️⃣ Presentation Layer (`MyPortfolio.Web`)
+**Der Einstieg.** Stellt API-Endpunkte und das Frontend bereit.
+*   **API:** ASP.NET Core Web API.
+*   **Realtime:** **SignalR** (Aktuell deaktiviert, siehe Known Issues).
+*   **Frontend:** React (Vite), **Tailwind CSS**, **shadcn/ui**.
 
-**Beispiel - Entity:**
-```csharp
-// src/MyPortfolio.Domain/Entities/Project.cs
-namespace MyPortfolio.Domain.Entities;
+---
 
-public class Project
-{
-    public Guid Id { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public List<string> Technologies { get; set; } = new();
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-}
-```
+## 🛠 Verwendete Technologien & Patterns
 
-### 2️⃣ Application Layer
-**Zweck:** Anwendungslogik, DTOs, Interfaces für Infrastructure.  
-**Abhängigkeiten:** Domain
+### Backend
+| Technologie | Zweck | Besonderheit |
+|:---|:---|:---|
+| **ASP.NET Core 9** | Web Framework | Neueste .NET Version |
+| **MediatR** | CQRS Pattern | Entkoppelt Commands/Queries von Handlern |
+| **FluentValidation** | Validierung | Automatische Validierung in der MediatR-Pipeline |
+| **EF Core 9** | ORM (Write) | Code-First Migrationen, PostgreSQL |
+| **Dapper** | Micro-ORM (Read) | Schnelle SQL-Queries für "Get"-Operationen |
+| **Hangfire** | Job Scheduler | Background Processing (mit PostgreSQL Storage) |
+| **MinIO** | Blob Storage | S3-kompatibler lokaler Speicher |
+| **SignalR** | Weosckets | Echtzeit-Updates (Push Notifications) |
 
-**Beispiel - DTO:**
-```csharp
-// src/MyPortfolio.Application/DTOs/ProjectDto.cs
-namespace MyPortfolio.Application.DTOs;
+### Frontend (`/ClientApp`)
+| Technologie | Zweck | Besonderheit |
+|:---|:---|:---|
+| **React 19** | UI Library | Hooks, Functional Components |
+| **Vite** | Build Tool | Extrem schneller Dev-Server |
+| **TanStack Query** | State Management | Caching, Re-Fetching, Loading-States |
+| **shadcn/ui** | UI Komponenten | Basierend auf **Radix UI** & **Tailwind** (Manuell integriert) |
+| **Tailwind CSS** | Styling | Utility-First CSS |
+| **Axios/Fetch** | HTTP Client | Kommunikation mit Backend API |
 
-public class ProjectDto
-{
-    public Guid Id { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public List<string> Technologies { get; set; } = new();
-}
-```
+---
 
-**Beispiel - Interface:**
-```csharp
-// src/MyPortfolio.Application/Interfaces/IProjectRepository.cs
-namespace MyPortfolio.Application.Interfaces;
+## 💡 Anwendungsfälle & Code-Beispiele
 
-public interface IProjectRepository
-{
-    Task<List<Project>> GetAllAsync();
-    Task<Project?> GetByIdAsync(Guid id);
-    Task AddAsync(Project project);
-}
-```
+### 1. Daten abrufen (Query Flow)
+**Ziel:** Liste aller Projekte anzeigen.
+*   **UI:** `useProjects` Hook (TanStack Query) ruft API.
+*   **API:** `ProjectsController` sendet `GetProjectsQuery`.
+*   **Application:** `GetProjectsQueryHandler` nutzt Repository/Dapper.
 
-**Beispiel - Dependency Injection:**
-```csharp
-// src/MyPortfolio.Application/DependencyInjection.cs
-public static class DependencyInjection
-{
-    public static IServiceCollection AddApplication(this IServiceCollection services)
-    {
-        var config = TypeAdapterConfig.GlobalSettings;
-        config.NewConfig<Project, ProjectDto>();
-        
-        services.AddSingleton(config);
-        services.AddScoped<IMapper, ServiceMapper>();
-        return services;
-    }
-}
-```
-
-### 3️⃣ Infrastructure Layer
-**Zweck:** Implementierung der Interfaces (Datenbank, externe Services).  
-**Abhängigkeiten:** Application, Domain
-
-**Beispiel - DbContext:**
-```csharp
-// src/MyPortfolio.Infrastructure/Persistence/ApplicationDbContext.cs
-public class ApplicationDbContext : DbContext
-{
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) 
-        : base(options) { }
-
-    public DbSet<Project> Projects { get; set; }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<Project>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
-        });
-    }
-}
-```
-
-**Beispiel - Repository:**
-```csharp
-// src/MyPortfolio.Infrastructure/Repositories/ProjectRepository.cs
-public class ProjectRepository : IProjectRepository
-{
-    private readonly ApplicationDbContext _context;
-
-    public ProjectRepository(ApplicationDbContext context)
-    {
-        _context = context;
-    }
-
-    public async Task<List<Project>> GetAllAsync()
-    {
-        return await _context.Projects.ToListAsync();
-    }
-}
-```
-
-**Beispiel - Dependency Injection:**
-```csharp
-// src/MyPortfolio.Infrastructure/DependencyInjection.cs
-public static class DependencyInjection
-{
-    public static IServiceCollection AddInfrastructure(
-        this IServiceCollection services, 
-        IConfiguration configuration)
-    {
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
-            
-        services.AddScoped<IProjectRepository, ProjectRepository>();
-        return services;
-    }
-}
-```
-
-### 4️⃣ Web/Presentation Layer
-**Zweck:** API-Endpoints, Hosting, Frontend.  
-**Abhängigkeiten:** Application, Infrastructure
-
-**Beispiel - Program.cs:**
-```csharp
-// src/MyPortfolio.Web/Program.cs
-using MyPortfolio.Application;
-using MyPortfolio.Infrastructure;
-
-var builder = WebApplication.CreateBuilder(args);
-
-// Dependency Injection
-builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.Run();
-```
-
-**Beispiel - API Endpoint (zukünftig):**
-```csharp
-app.MapGet("/api/projects", async (IProjectRepository repo, IMapper mapper) =>
-{
-    var projects = await repo.GetAllAsync();
-    return Results.Ok(mapper.Map<List<ProjectDto>>(projects));
+**Code:**
+```javascript
+// Frontend: useProjects.js
+export const useProjects = () => useQuery({ 
+  queryKey: ['projects'], 
+  queryFn: fetchProjects 
 });
 ```
 
-## Technologie-Stack
-
-### Backend
-- **Framework:** ASP.NET Core 9
-- **ORM:** Entity Framework Core 9
-- **Datenbank:** PostgreSQL 16
-- **Mapping:** Mapster
-- **API-Dokumentation:** Swagger/OpenAPI
-
-### Frontend
-- **Framework:** React 18
-- **Build Tool:** Vite
-- **Styling:** Bootstrap 5
-- **Sprache:** JavaScript
-
-### DevOps
-- **Containerisierung:** Docker & Docker Compose
-- **Versionskontrolle:** Git
-
-## Schnellstart
-
-**Vollständige Anleitung:** Siehe [README_START.md](./README_START.md)
-
-**Kurzversion:**
-```bash
-# 1. Datenbank starten
-docker-compose up -d
-
-# 2. Backend starten
-dotnet run --project src/MyPortfolio.Web
-
-# 3. Frontend starten (neues Terminal)
-cd src/MyPortfolio.Web/ClientApp
-npm run dev
+```csharp
+// Backend: Handler
+public async Task<List<ProjectDto>> Handle(GetProjectsQuery request, CancellationToken ct) {
+    // Repository Zugriff
+    return await _context.Projects.ProjectToType<ProjectDto>().ToListAsync(); 
+}
 ```
 
-**URLs:**
-- Backend API: http://localhost:5298
-- Swagger UI: http://localhost:5298/swagger
-- Frontend: http://localhost:5173
+### 2. Daten anlegen (Command Flow)
+**Ziel:** Neues Projekt erstellen.
+*   **UI:** Formular sendet Daten via `useCreateProject`.
+*   **API:** Controller sendet `CreateProjectCommand`.
+*   **Validation:** `ValidationBehavior` prüft Regeln (z.B. "Titel Pflichtfeld").
+*   **Application:** Handler speichert Entity, feuert evtl. Domain Events.
 
-## Weitere Dokumentation
+**Code:**
+```csharp
+// Validation
+public class CreateProjectCommandValidator : AbstractValidator<CreateProjectCommand> {
+    public CreateProjectCommandValidator() {
+        RuleFor(v => v.Title).NotEmpty().MaximumLength(200);
+    }
+}
+```
 
-- **[README_START.md](./README_START.md)** - Komplette Setup-Anleitung
-- **[Frontend README](./src/MyPortfolio.Web/ClientApp/README.md)** - React/Vite Entwicklung
+---
+
+## ⚠️ Known Issues
+
+*   **SignalR Build Conflict:** Die aktive Registrierung von `AddSignalRT` in `Program.cs` ist aktuell **auskommentiert**. Es gibt einen Versionskonflikt (CS0433) zwischen dem .NET 9.0 Framework und `Hangfire.AspNetCore`-Abhängigkeiten. Echtzeit-Features sind daher vorübergehend inaktiv.
+
+---
+
+## 🚀 Start-Anleitung
+
+Voraussetzungen: **Docker Desktop**, **.NET 9 SDK**, **Node.js 20+**.
+
+1.  **Infrastruktur starten** (Postgres, MinIO):
+    ```bash
+    docker-compose up -d
+    ```
+
+2.  **Backend starten**:
+    ```bash
+    dotnet run --project src/MyPortfolio.Web
+    # Swagger: http://localhost:5298/swagger
+    # Hangfire: http://localhost:5298/hangfire
+    ```
+
+3.  **Frontend starten**:
+    ```bash
+    cd src/MyPortfolio.Web/ClientApp
+    npm install
+    npm run dev
+    # App: http://localhost:5173
+    ```
